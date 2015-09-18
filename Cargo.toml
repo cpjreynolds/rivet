@@ -1,0 +1,9 @@
+[package]
+name = "rev"
+version = "0.1.0"
+authors = ["Cole Reynolds <cpjreynolds@gmail.com>"]
+
+[dependencies]
+libc = "0.1"
+bitflags = "0.3"
+
