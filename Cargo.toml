@@ -6,4 +6,6 @@ authors = ["Cole Reynolds <cpjreynolds@gmail.com>"]
 [dependencies]
 libc = "0.1"
 bitflags = "0.3"
-
+time = "0.1"
+num = "0.1"
+nix = "0.4"
