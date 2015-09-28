@@ -3,6 +3,10 @@ name = "rev"
 version = "0.1.0"
 authors = ["Cole Reynolds <cpjreynolds@gmail.com>"]
 
+[features]
+default = []
+select = []
+
 [dependencies]
 libc = "0.1"
 bitflags = "0.3"

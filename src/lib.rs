@@ -4,12 +4,13 @@ extern crate time;
 extern crate num;
 extern crate nix;
 
-mod sys;
-pub use sys::{
+pub mod selector;
+pub use self::selector::{
     Selector,
     Fired,
 };
 mod event;
+pub use event::EventSet;
 
 use std::os::unix::io::AsRawFd;
 use std::io::{

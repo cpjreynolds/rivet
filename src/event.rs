@@ -1,17 +1,3 @@
-use std::os::unix::io::RawFd;
-use std::ops::{
-    BitAnd,
-    BitOr,
-    BitXor,
-    Sub,
-    Not,
-};
-
-pub struct Event {
-    pub fd: RawFd,
-    pub set: EventSet,
-}
-
 bitflags! {
     /// The set of events associated with a file descriptor.
     flags EventSet: usize {

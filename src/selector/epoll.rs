@@ -14,11 +14,9 @@ use std::iter::{
 use libc;
 use time::Duration;
 
-use event::{
-    EventSet,
-    Event,
-};
+use event::EventSet;
 
+#[allow(dead_code)]
 mod ffi {
     use libc::c_int;
     use event::EventSet;
@@ -164,12 +162,12 @@ impl Selector {
         })
     }
 
-    pub fn poll(&mut self) -> Result<Fired> {
+    pub fn poll(&mut self) -> Result<IterFired> {
         let timeout = Duration::milliseconds(-1);
         self.poll_timeout(timeout)
     }
 
-    pub fn poll_timeout(&mut self, timeout: Duration) -> Result<Fired> {
+    pub fn poll_timeout(&mut self, timeout: Duration) -> Result<IterFired> {
         // Pass kernel the entire length of the `events` buffer, it will overwrite the memory as
         // needed and return the new length.
         let dst = unsafe {
@@ -186,7 +184,7 @@ impl Selector {
             self.events.set_len(nevents);
         }
 
-        Ok(Fired(self.events.iter()))
+        Ok(IterFired(self.events.iter()))
     }
 
     pub fn register(&mut self, fd: RawFd, evts: EventSet) -> Result<()> {
@@ -225,19 +223,37 @@ impl Drop for Selector {
     }
 }
 
-/// Iterator over the fired events of a selector.
-pub struct Fired<'a>(slice::Iter<'a, ffi::epoll_event>);
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct Fired {
+    fd: RawFd,
+    evset: EventSet,
+}
 
-impl<'a> Iterator for Fired<'a> {
-    type Item = Event;
+impl Fired {
+    pub fn fd(&self) -> RawFd {
+        self.fd
+    }
+
+    pub fn evset(&self) -> EventSet {
+        self.evset
+    }
+
+    fn from_epoll(epev: &ffi::epoll_event) -> Fired {
+        Fired {
+            fd: epev.data as RawFd,
+            evset: epev.events.into(),
+        }
+    }
+}
+
+/// Iterator over the fired events of a `Selector`.
+pub struct IterFired<'a>(slice::Iter<'a, ffi::epoll_event>);
+
+impl<'a> Iterator for IterFired<'a> {
+    type Item = Fired;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.0.next().map(|evt| {
-            Event {
-                fd: evt.data as RawFd,
-                set: evt.events.into(),
-            }
-        })
+        self.0.next().map(Fired::from_epoll)
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
@@ -245,5 +261,11 @@ impl<'a> Iterator for Fired<'a> {
     }
 }
 
-impl<'a> ExactSizeIterator for Fired<'a> {}
+impl<'a> ExactSizeIterator for IterFired<'a> {}
+
+impl<'a> DoubleEndedIterator for IterFired<'a> {
+    fn next_back(&mut self) -> Option<Self::Item> {
+        self.0.next_back().map(Fired::from_epoll)
+    }
+}
 
