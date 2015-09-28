@@ -7,6 +7,7 @@ extern crate nix;
 pub mod selector;
 pub use self::selector::{
     Selector,
+    IterFired,
     Fired,
 };
 mod event;
