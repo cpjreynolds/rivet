@@ -13,7 +13,10 @@ pub use self::selector::{
 mod event;
 pub use event::EventSet;
 
-use std::os::unix::io::AsRawFd;
+use std::os::unix::io::{
+    RawFd,
+    AsRawFd,
+};
 use std::io::{
     Result,
     Error,
@@ -72,3 +75,40 @@ impl<T> NonBlocking for T
     }
 }
 
+pub unsafe fn set_nonblock(fd: RawFd) -> Result<()> {
+    let res = {
+        let mut flags = libc::fcntl(fd, libc::F_GETFL);
+        flags |= libc::O_NONBLOCK;
+        libc::fcntl(fd, libc::F_SETFL, flags)
+    };
+
+    if res == -1 {
+        Err(Error::last_os_error())
+    } else {
+        Ok(())
+    }
+}
+
+pub unsafe fn set_block(fd: RawFd) -> Result<()> {
+    let res = {
+        let mut flags = libc::fcntl(fd, libc::F_GETFL);
+        flags &= !libc::O_NONBLOCK;
+        libc::fcntl(fd, libc::F_SETFL, flags)
+    };
+
+    if res == -1 {
+        Err(Error::last_os_error())
+    } else {
+        Ok(())
+    }
+}
+
+pub unsafe fn is_nonblock(fd: RawFd) -> bool {
+    let flags = libc::fcntl(fd, libc::F_GETFL);
+
+    (flags & libc::O_NONBLOCK) == libc::O_NONBLOCK
+}
+
+pub unsafe fn is_block(fd: RawFd) -> bool {
+    is_nonblock(fd)
+}
