@@ -1,3 +1,7 @@
+#![cfg_attr(feature = "nightly", feature(deque_extras))]
+#![cfg_attr(feature = "nightly", feature(drain))]
+#![cfg_attr(feature = "nightly", feature(vec_resize))]
+
 #[macro_use] extern crate bitflags;
 extern crate libc;
 extern crate time;
@@ -11,7 +15,12 @@ pub use self::selector::{
     Fired,
 };
 mod event;
-pub use event::EventSet;
+pub use self::event::EventSet;
+
+#[cfg(feature = "nightly")]
+pub mod io;
+#[cfg(feature = "nightly")]
+pub mod buf;
 
 use std::os::unix::io::{
     RawFd,
