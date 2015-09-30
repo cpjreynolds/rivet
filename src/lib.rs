@@ -21,6 +21,9 @@ pub use self::event::EventSet;
 pub mod io;
 #[cfg(feature = "nightly")]
 pub mod buf;
+#[cfg(feature = "nightly")]
+pub use buf::Buffer;
+
 
 use std::os::unix::io::{
     RawFd,
