@@ -28,9 +28,11 @@ pub use self::kqueue::{
     Fired,
 };
 
-#[cfg(feature = "select")]
+#[cfg(any(feature = "select",
+          target_os = "macos"))]
 mod select;
-#[cfg(feature = "select")]
+#[cfg(any(feature = "select",
+          target_os = "macos"))]
 pub use self::select::{
     Selector,
     IterFired,
