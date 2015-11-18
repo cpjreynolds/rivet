@@ -69,12 +69,9 @@ mod ffi {
         }
 
         pub fn find_max(&self, prev_max: RawFd) -> RawFd {
-            let mut idx = get_elt(prev_max);
-            for elt in self.fds_bits[..(idx + 1)].iter().rev() {
-                if *elt == 0 {
-                    idx -= 1;
-                    continue;
-                } else {
+            let max_idx = get_elt(prev_max);
+            for (idx, &elt) in self.fds_bits[..(max_idx + 1)].iter().enumerate().rev() {
+                if elt != 0 {
                     let zeros = elt.leading_zeros() as usize;
                     let shift = NFD_BITS - (zeros + 1);
 
