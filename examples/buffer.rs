@@ -1,7 +1,7 @@
-extern crate rev;
+extern crate rivet;
 
 use std::io::prelude::*;
-use rev::buffer::sync;
+use rivet::buffer::sync;
 use std::iter;
 use std::thread;
 
