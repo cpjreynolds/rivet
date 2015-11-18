@@ -1,4 +1,4 @@
-extern crate rev;
+extern crate rivet;
 extern crate time;
 extern crate libc;
 
@@ -7,7 +7,7 @@ use std::io;
 use std::io::prelude::*;
 use std::os::unix::io::RawFd;
 
-use rev::{Selector, EventSet};
+use rivet::{Selector, EventSet};
 use time::Duration;
 
 struct Pipe {
