@@ -1,6 +1,6 @@
 bitflags! {
     /// The set of events associated with a file descriptor.
-    flags EventSet: usize {
+    pub flags EventSet: usize {
         const READABLE = 0b0001,
         const WRITABLE = 0b0010,
         const ERROR = 0b0100,

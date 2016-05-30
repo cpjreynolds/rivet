@@ -23,7 +23,7 @@ mod ffi {
 
     bitflags! {
         #[repr(C)]
-        flags EpollFlag: c_int {
+        pub flags EpollFlag: c_int {
             const EPOLLIN = 0x001,
             const EPOLLOUT = 0x004,
             const EPOLLERR = 0x008,
@@ -76,7 +76,7 @@ mod ffi {
 
     bitflags! {
         #[repr(C)]
-        flags EpollOp: c_int {
+        pub flags EpollOp: c_int {
             const EPOLL_CTL_ADD = 1,
             const EPOLL_CTL_DEL = 2,
             const EPOLL_CTL_MOD = 3,

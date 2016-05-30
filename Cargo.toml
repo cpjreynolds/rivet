@@ -8,8 +8,8 @@ default = []
 select = []
 
 [dependencies]
-libc = "0.1"
-bitflags = "0.3"
+libc = "0.2"
+bitflags = "0.7"
 time = "0.1"
 num = "0.1"
 rand = "0.3"

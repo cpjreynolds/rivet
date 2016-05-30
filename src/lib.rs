@@ -14,7 +14,6 @@ mod event;
 pub use self::event::EventSet;
 
 pub mod io;
-pub mod buffer;
 
 use std::os::unix::io::{
     RawFd,
