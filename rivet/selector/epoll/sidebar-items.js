@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Fired",""],["IterFired","Iterator over the fired events of a `Selector`."],["Selector",""]]});

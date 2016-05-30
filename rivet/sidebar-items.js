@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["is_block",""],["is_nonblock",""],["set_block",""],["set_nonblock",""]],"mod":[["io",""],["selector",""]],"struct":[["EventSet","The set of events associated with a file descriptor."],["Fired",""],["IterFired","Iterator over the fired events of a `Selector`."],["Selector",""]],"trait":[["NonBlocking",""]]});

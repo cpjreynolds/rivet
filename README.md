@@ -1,3 +1,0 @@
-# Rev
-
-Rust event library.

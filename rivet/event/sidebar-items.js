@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["EventSet","The set of events associated with a file descriptor."]]});
