@@ -1,14 +1,7 @@
 use std::os::unix::io::RawFd;
 use std::slice;
-use std::io::{
-    Result,
-    Error,
-};
-use std::iter::{
-    Iterator,
-    DoubleEndedIterator,
-    ExactSizeIterator,
-};
+use std::io::{Result, Error};
+use std::iter::{Iterator, DoubleEndedIterator, ExactSizeIterator};
 
 
 use libc;
@@ -99,13 +92,14 @@ mod ffi {
         pub data: u64,
     }
 
-    extern {
+    extern "C" {
         pub fn epoll_create(size: c_int) -> c_int;
         pub fn epoll_ctl(epfd: c_int, op: c_int, fd: c_int, event: *const epoll_event) -> c_int;
         pub fn epoll_wait(epfd: c_int,
                           events: *mut epoll_event,
                           maxevents: c_int,
-                          timeout: c_int) -> c_int;
+                          timeout: c_int)
+                          -> c_int;
     }
 }
 
@@ -120,9 +114,7 @@ fn epoll_create() -> Result<RawFd> {
 }
 
 fn epoll_ctl(epfd: RawFd, op: ffi::EpollOp, fd: RawFd, event: &ffi::epoll_event) -> Result<()> {
-    let res = unsafe {
-        ffi::epoll_ctl(epfd, op.bits(), fd, event)
-    };
+    let res = unsafe { ffi::epoll_ctl(epfd, op.bits(), fd, event) };
 
     if res == -1 {
         Err(Error::last_os_error())
@@ -170,11 +162,8 @@ impl Selector {
     pub fn poll_timeout(&mut self, timeout: Duration) -> Result<IterFired> {
         // Pass kernel the entire length of the `events` buffer, it will overwrite the memory as
         // needed and return the new length.
-        let dst = unsafe {
-            slice::from_raw_parts_mut(
-                self.events.as_mut_ptr(),
-                self.events.capacity())
-        };
+        let dst =
+            unsafe { slice::from_raw_parts_mut(self.events.as_mut_ptr(), self.events.capacity()) };
 
         // `events` becomes unsafe to access after this call.
         let nevents = try!(epoll_wait(self.epfd, dst, timeout));
@@ -217,9 +206,7 @@ impl Selector {
 
 impl Drop for Selector {
     fn drop(&mut self) {
-        let _ = unsafe {
-            libc::close(self.epfd)
-        };
+        let _ = unsafe { libc::close(self.epfd) };
     }
 }
 
@@ -268,4 +255,3 @@ impl<'a> DoubleEndedIterator for IterFired<'a> {
         self.0.next_back().map(Fired::from_epoll)
     }
 }
-

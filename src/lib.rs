@@ -1,28 +1,18 @@
-#[macro_use] extern crate bitflags;
+#[macro_use]
+extern crate bitflags;
 extern crate libc;
 extern crate time;
 extern crate num;
 extern crate rand;
 
 pub mod selector;
-pub use self::selector::{
-    Selector,
-    IterFired,
-    Fired,
-};
+pub use self::selector::{Selector, Iter, Fired};
 mod event;
 pub use self::event::EventSet;
-
 pub mod io;
 
-use std::os::unix::io::{
-    RawFd,
-    AsRawFd,
-};
-use std::io::{
-    Result,
-    Error,
-};
+use std::os::unix::io::{RawFd, AsRawFd};
+use std::io::{Result, Error};
 
 pub trait NonBlocking {
     fn set_nonblock(&mut self) -> Result<()>;
@@ -112,5 +102,5 @@ pub unsafe fn is_nonblock(fd: RawFd) -> bool {
 }
 
 pub unsafe fn is_block(fd: RawFd) -> bool {
-    is_nonblock(fd)
+    !is_nonblock(fd)
 }

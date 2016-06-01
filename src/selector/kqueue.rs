@@ -1,8 +1,5 @@
 use std::os::unix::io::RawFd;
-use std::io::{
-    Result,
-    Error,
-};
+use std::io::{Result, Error};
 use std::ptr;
 use std::slice;
 
@@ -24,10 +21,7 @@ mod ffi {
         EVFILT_READ = -1,
         EVFILT_WRITE = -2,
     }
-    pub use self::EventFilter::{
-        EVFILT_READ,
-        EVFILT_WRITE,
-    };
+    pub use self::EventFilter::{EVFILT_READ, EVFILT_WRITE};
 
     impl Into<EventSet> for EventFilter {
         fn into(self) -> EventSet {
@@ -82,23 +76,21 @@ mod ffi {
     // rustc does not recognize that kevent is repr(C).
     // See nix/src/sys/event.rs.
     #[allow(improper_ctypes)]
-    extern {
+    extern "C" {
         pub fn kqueue() -> libc::c_int;
 
-        pub fn kevent(
-            kq: libc::c_int,
-            changelist: *const kevent,
-            nchanges: libc::c_int,
-            eventlist: *mut kevent,
-            nevents: libc::c_int,
-            timeout: *const libc::timespec) -> libc::c_int;
+        pub fn kevent(kq: libc::c_int,
+                      changelist: *const kevent,
+                      nchanges: libc::c_int,
+                      eventlist: *mut kevent,
+                      nevents: libc::c_int,
+                      timeout: *const libc::timespec)
+                      -> libc::c_int;
     }
 }
 
 fn kqueue() -> Result<RawFd> {
-    let res = unsafe {
-        ffi::kqueue()
-    };
+    let res = unsafe { ffi::kqueue() };
 
     if res == -1 {
         Err(Error::last_os_error())
@@ -110,12 +102,13 @@ fn kqueue() -> Result<RawFd> {
 fn kevent(kq: RawFd,
           changelist: &[ffi::kevent],
           eventlist: &mut [ffi::kevent],
-          timeout: Option<Duration>) -> Result<usize>
-{
+          timeout: Option<Duration>)
+          -> Result<usize> {
     let tspec = if let Some(dur) = timeout {
         let sec = dur.num_seconds() as libc::time_t;
         let nsec = (dur - Duration::seconds(sec))
-            .num_nanoseconds().unwrap() as libc::c_long;
+            .num_nanoseconds()
+            .unwrap() as libc::c_long;
 
         &libc::timespec {
             tv_sec: sec,
@@ -126,13 +119,12 @@ fn kevent(kq: RawFd,
     };
 
     let res = unsafe {
-        ffi::kevent(
-            kq,
-            changelist.as_ptr(),
-            changelist.len() as libc::c_int,
-            eventlist.as_mut_ptr(),
-            eventlist.len() as libc::c_int,
-            tspec)
+        ffi::kevent(kq,
+                    changelist.as_ptr(),
+                    changelist.len() as libc::c_int,
+                    eventlist.as_mut_ptr(),
+                    eventlist.len() as libc::c_int,
+                    tspec)
     };
 
     if res == -1 {
@@ -160,11 +152,8 @@ impl Selector {
     }
 
     pub fn poll(&mut self) -> Result<IterFired> {
-        let dst = unsafe {
-            slice::from_raw_parts_mut(
-                self.events.as_mut_ptr(),
-                self.events.capacity())
-        };
+        let dst =
+            unsafe { slice::from_raw_parts_mut(self.events.as_mut_ptr(), self.events.capacity()) };
 
         let nevents = try!(kevent(self.kqfd, &[], dst, None));
 
@@ -176,11 +165,8 @@ impl Selector {
     }
 
     pub fn poll_timeout(&mut self, timeout: Duration) -> Result<IterFired> {
-        let dst = unsafe {
-            slice::from_raw_parts_mut(
-                self.events.as_mut_ptr(),
-                self.events.capacity())
-        };
+        let dst =
+            unsafe { slice::from_raw_parts_mut(self.events.as_mut_ptr(), self.events.capacity()) };
 
         let nevents = try!(kevent(self.kqfd, &[], dst, Some(timeout)));
 
@@ -257,9 +243,7 @@ impl Selector {
 
 impl Drop for Selector {
     fn drop(&mut self) {
-        let _ = unsafe {
-            libc::close(self.kqfd)
-        };
+        let _ = unsafe { libc::close(self.kqfd) };
     }
 }
 
@@ -308,4 +292,3 @@ impl<'a> DoubleEndedIterator for IterFired<'a> {
         self.0.next_back().map(Fired::from_kevent)
     }
 }
-

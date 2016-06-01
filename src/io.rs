@@ -1,8 +1,5 @@
 use std::io::prelude::*;
-use std::io::{
-    Result,
-    ErrorKind,
-};
+use std::io::{Result, ErrorKind};
 
 pub trait ReadExt: Read {
     fn read_nb(&mut self, buf: &mut [u8]) -> Result<usize> {
@@ -16,7 +13,7 @@ pub trait ReadExt: Read {
             match self.read(&mut buf[nread..]) {
                 Ok(0) => return Ok(nread),
                 Ok(n) => nread += n,
-                Err(ref e) if e.kind() == ErrorKind::Interrupted => {},
+                Err(ref e) if e.kind() == ErrorKind::Interrupted => {}
                 Err(ref e) if e.kind() == ErrorKind::WouldBlock => return Ok(nread),
                 Err(e) => return Err(e),
             }
@@ -38,7 +35,7 @@ pub trait WriteExt: Write {
             match self.write(&buf[nwrit..]) {
                 Ok(0) => return Ok(nwrit),
                 Ok(n) => nwrit += n,
-                Err(ref e) if e.kind() == ErrorKind::Interrupted => {},
+                Err(ref e) if e.kind() == ErrorKind::Interrupted => {}
                 Err(ref e) if e.kind() == ErrorKind::WouldBlock => return Ok(nwrit),
                 Err(e) => return Err(e),
             }
@@ -47,4 +44,3 @@ pub trait WriteExt: Write {
 }
 
 impl<T> WriteExt for T where T: Write {}
-
